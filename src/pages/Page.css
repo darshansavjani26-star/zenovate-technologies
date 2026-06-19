@@ -1,0 +1,36 @@
+.page__hero {
+  position: relative;
+  padding: 10rem clamp(1.25rem, 5vw, 4rem) 5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.page__hero-glow {
+  position: absolute;
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,229,160,0.1) 0%, transparent 70%);
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.page__hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.page__hero-content .section-eyebrow {
+  justify-content: center;
+}
+.page__hero-content .section-eyebrow::before { display: none; }
+
+.page__hero-heading {
+  margin: 0.75rem 0 1rem;
+}
+
+.page__hero-sub {
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  color: var(--clr-muted);
+  line-height: 1.7;
+}
