@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 const COMPANY_EMAIL = "contact.zenovate@gmail.com";
 const COMPANY_PHONE = "+91 98981 94788";
 const COMPANY_PHONE_LINK = "+919898194788";
-const API_URL = "http://localhost:5000/api/contact/create";
+const API_URL = "https://zenovate-technologies.onrender.com/api/contact/create";
 
 const CSS = `
 .contact {
