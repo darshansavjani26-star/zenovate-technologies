@@ -655,6 +655,135 @@ const CSS = `
     justify-content: center;
   }
 }
+  .monsoon-wrap {
+  padding: 56px 48px 0;
+  background: var(--sage);
+  display: flex;
+  justify-content: center;
+}
+
+.monsoon-card {
+  max-width: 620px;
+  width: 100%;
+  background: #1a2e17;
+  border: 0.5px solid rgba(212,176,106,0.3);
+  padding: 40px 44px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.monsoon-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(212,176,106,0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.monsoon-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #d4b06a;
+  border: 0.5px solid rgba(212,176,106,0.35);
+  padding: 6px 16px;
+  margin-bottom: 20px;
+}
+
+.monsoon-h {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 18px;
+}
+
+.monsoon-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.monsoon-original {
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  color: #e05252;
+  text-decoration: line-through;
+  opacity: 0.85;
+}
+
+.monsoon-offer-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(38px, 5vw, 56px);
+  color: #d4b06a;
+  line-height: 1;
+}
+
+.monsoon-features {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.monsoon-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.75);
+}
+
+.monsoon-features li svg {
+  color: #d4b06a;
+  flex-shrink: 0;
+}
+
+.monsoon-btn {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #d4b06a;
+  color: #0e1a0c;
+  margin-bottom: 14px;
+}
+
+.monsoon-note {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.45);
+}
+
+@media (max-width: 600px) {
+  .monsoon-wrap {
+    padding: 40px 20px 0;
+  }
+
+  .monsoon-card {
+    padding: 32px 24px;
+  }
+
+  .monsoon-features {
+    grid-template-columns: 1fr;
+  }
+}
 `
 
 const FadeIn = ({ children, delay = 0, y = 24 }) => {
@@ -735,6 +864,13 @@ export default function Pricing() {
       `New Project Inquiry — Zenovate Technologies\n\nName: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nService: ${form.service}\nBudget: ${form.budget}\n\nProject Details:\n${form.details}`
     )
 
+    const claimMonsoonOffer = () => {
+      const msg = encodeURIComponent(
+        `Hello,\nI'm interested in your Monsoon Website Offer.\nPlease share more details.`
+      )
+      window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank")
+    }
+
     window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank")
     setForm({ name: "", email: "", phone: "", service: "Website Development", budget: "₹10k – ₹25k", details: "" })
     setToast(true)
@@ -775,6 +911,43 @@ export default function Pricing() {
               ))}
             </div>
           </motion.div>
+        </section>
+
+        <section className="monsoon-wrap">
+          <FadeIn>
+            <div className="monsoon-card">
+              <div className="monsoon-tag">🌧️ Limited Time Offer</div>
+              <h2 className="monsoon-h">Monsoon Special Offer</h2>
+
+              <div className="monsoon-price-row">
+                <span className="monsoon-original">₹16,000</span>
+                <span className="monsoon-offer-price">₹12,000</span>
+              </div>
+
+              <ul className="monsoon-features">
+                {[
+                  "Hosting Included",
+                  "Domain Included",
+                  "7 Pages",
+                  "Mobile Responsive",
+                  "SEO Ready",
+                  "Fast Delivery",
+                ].map((f) => (
+                  <li key={f}>
+                    <Check size={13} strokeWidth={2.5} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button className="monsoon-btn" onClick={claimMonsoonOffer}>
+                <MessageCircle size={14} />
+                Claim Offer
+              </button>
+
+              <p className="monsoon-note">Offer Valid For Limited Time Only</p>
+            </div>
+          </FadeIn>
         </section>
 
         <section className="plans-wrap">

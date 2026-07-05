@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://zenovate-technologies.vercel.app/sitemap.xml
+Sitemap: https://zenovate-technologies.vercel.app/sitemap.xmlc

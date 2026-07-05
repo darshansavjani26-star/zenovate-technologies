@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Points, PointMaterial } from '@react-three/drei'
 import { gsap } from 'gsap'
-import { ArrowRight, Zap } from 'lucide-react'
+import { ArrowRight, Check, CloudRain } from 'lucide-react'
 
 function ParticleField() {
   const ref = useRef()
@@ -35,7 +35,21 @@ function ParticleField() {
   )
 }
 
-const words = ['Websites', 'Mobile Apps', 'SaaS Products', 'E-commerce']
+// Rain drop config (computed once, not on every render)
+const RAIN_DROPS = Array.from({ length: 34 }, (_, i) => ({
+  id: i,
+  left: Math.random() * 100,
+  delay: Math.random() * 4,
+  duration: 2.4 + Math.random() * 2.2,
+  height: 40 + Math.random() * 40,
+}))
+
+const offerHighlights = [
+  '7 Page Professional Website',
+  'FREE Hosting (1 Year)',
+  'FREE Premium Domain (1 Year)',
+  '1 FREE Service',
+]
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
@@ -49,6 +63,7 @@ const CSS = `
     --green3: #8ab87a;
     --ink: #1e3a1a;
     --muted: #7a9a74;
+    --gold: #d4b06a;
   }
 
   .hero {
@@ -68,6 +83,31 @@ const CSS = `
     inset: 0;
     z-index: 0;
     opacity: 0.45;
+  }
+
+  .hero__rain {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .hero__raindrop {
+    position: absolute;
+    top: -10%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(90,142,84,0.4), transparent);
+    animation-name: rainFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes rainFall {
+    0% { transform: translateY(-10%); opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    100% { transform: translateY(115vh); opacity: 0; }
   }
 
   .hero__glow {
@@ -91,15 +131,15 @@ const CSS = `
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    border: 0.5px solid var(--sage3);
-    background: rgba(228,237,225,0.7);
+    border: 0.5px solid var(--gold);
+    background: rgba(212,176,106,0.12);
     padding: 6px 15px;
     font-family: 'Jost', sans-serif;
     font-weight: 400;
     font-size: 9px;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--green2);
+    color: #a3813c;
     margin-bottom: 26px;
   }
 
@@ -107,7 +147,7 @@ const CSS = `
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--green3);
+    background: var(--gold);
     animation: heroBlink 2s ease-in-out infinite;
   }
 
@@ -119,11 +159,11 @@ const CSS = `
   .hero__heading {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
-    font-size: clamp(46px, 6vw, 76px);
-    line-height: 1.05;
+    font-size: clamp(42px, 5.6vw, 70px);
+    line-height: 1.08;
     letter-spacing: 0.02em;
     color: var(--ink);
-    margin-bottom: 22px;
+    margin-bottom: 14px;
     display: flex;
     flex-direction: column;
   }
@@ -131,6 +171,15 @@ const CSS = `
   .hero__word {
     font-style: italic;
     color: var(--green2);
+  }
+
+  .hero__subtitle {
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    color: var(--green);
+    margin-bottom: 16px;
   }
 
   .hero__sub {
@@ -141,14 +190,14 @@ const CSS = `
     line-height: 2;
     color: var(--muted);
     max-width: 460px;
-    margin-bottom: 36px;
+    margin-bottom: 30px;
   }
 
   .hero__cta {
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-bottom: 42px;
+    margin-bottom: 34px;
   }
 
   .hero__btn-main {
@@ -193,23 +242,32 @@ const CSS = `
     color: var(--ink);
   }
 
-  .hero__trust {
+  .hero__highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .hero__highlight-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .hero__trust-pill {
     font-family: 'Jost', sans-serif;
     font-weight: 400;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+  }
+
+  .hero__highlight-check {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(90,142,84,0.15);
     color: var(--green2);
-    border: 0.5px solid var(--sage3);
-    padding: 5px 13px;
-    background: var(--sage2);
+    flex-shrink: 0;
   }
 
   .hero__visual {
@@ -297,11 +355,11 @@ const CSS = `
 
 export default function Hero() {
   const headingRef = useRef()
+  const subtitleRef = useRef()
   const subRef = useRef()
   const badgeRef = useRef()
   const ctaRef = useRef()
-  const wordRef = useRef()
-  const wordIdx = useRef(0)
+  const highlightsRef = useRef()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -322,6 +380,14 @@ export default function Hero() {
         ease: 'power4.out',
       })
 
+      gsap.from(subtitleRef.current, {
+        opacity: 0,
+        y: 24,
+        duration: 0.8,
+        delay: 0.85,
+        ease: 'power3.out',
+      })
+
       gsap.from(subRef.current, {
         opacity: 0,
         y: 30,
@@ -339,34 +405,14 @@ export default function Hero() {
         ease: 'power3.out',
       })
 
-      const cycle = () => {
-        wordIdx.current = (wordIdx.current + 1) % words.length
-
-        gsap.to(wordRef.current, {
-          opacity: 0,
-          y: -18,
-          duration: 0.35,
-          delay: 1.8,
-          ease: 'power2.in',
-          onComplete: () => {
-            wordRef.current.textContent = words[wordIdx.current]
-
-            gsap.fromTo(
-              wordRef.current,
-              { opacity: 0, y: 18 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.45,
-                ease: 'power2.out',
-                onComplete: cycle,
-              }
-            )
-          },
-        })
-      }
-
-      gsap.delayedCall(2, cycle)
+      gsap.from(highlightsRef.current.children, {
+        opacity: 0,
+        x: -16,
+        stagger: 0.1,
+        duration: 0.6,
+        delay: 1.5,
+        ease: 'power3.out',
+      })
     })
 
     return () => ctx.revert()
@@ -385,42 +431,62 @@ export default function Hero() {
           </Canvas>
         </div>
 
+        <div className="hero__rain" aria-hidden="true">
+          {RAIN_DROPS.map((drop) => (
+            <span
+              key={drop.id}
+              className="hero__raindrop"
+              style={{
+                left: `${drop.left}%`,
+                height: `${drop.height}px`,
+                animationDuration: `${drop.duration}s`,
+                animationDelay: `${drop.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="hero__glow" />
 
         <div className="hero__content">
           <div className="hero__badge" ref={badgeRef}>
             <span className="hero__badge-dot" />
-            <Zap size={11} />
-            Premium Digital Studio
+            <CloudRain size={11} />
+            Limited Time Offer
           </div>
 
           <h1 className="hero__heading" ref={headingRef}>
-            <span>We Design</span>
-            <span>
-              Smart <span ref={wordRef} className="hero__word">Websites</span>
-            </span>
-            <span>For Growth</span>
+            <span>🌧️ Monsoon</span>
+            <span className="hero__word">Special Offer</span>
           </h1>
 
+          <p className="hero__subtitle" ref={subtitleRef}>
+            Launch Your Business Website This Monsoon
+          </p>
+
           <p className="hero__sub" ref={subRef}>
-            Zenovate Technologies builds clean, premium and conversion-focused digital
-            products for modern brands, startups and businesses.
+            Build your professional business website with exclusive monsoon benefits.
           </p>
 
           <div className="hero__cta" ref={ctaRef}>
             <Link to="/contact" className="hero__btn-main">
-              Start Your Project <ArrowRight size={15} />
+              Book Now <ArrowRight size={15} />
             </Link>
 
-            <Link to="/portfolio" className="hero__btn-ghost">
-              View Work
+            <Link to="/pricing" className="hero__btn-ghost">
+              View Offer
             </Link>
           </div>
 
-          <div className="hero__trust">
-            <div className="hero__trust-pill">Web Design</div>
-            <div className="hero__trust-pill">React Apps</div>
-            <div className="hero__trust-pill">SaaS UI</div>
+          <div className="hero__highlights" ref={highlightsRef}>
+            {offerHighlights.map((item) => (
+              <div className="hero__highlight-item" key={item}>
+                <span className="hero__highlight-check">
+                  <Check size={10} strokeWidth={3} />
+                </span>
+                {item}
+              </div>
+            ))}
           </div>
         </div>
 
