@@ -857,25 +857,46 @@ export default function Pricing() {
     window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank")
   }
 
+  const claimMonsoonOffer = () => {
+    const msg = encodeURIComponent(
+      `Hello,
+I'm interested in your Monsoon Website Offer.
+Please share more details.`
+    );
+
+    window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank");
+  };
+
   const submitForm = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const msg = encodeURIComponent(
-      `New Project Inquiry — Zenovate Technologies\n\nName: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nService: ${form.service}\nBudget: ${form.budget}\n\nProject Details:\n${form.details}`
-    )
+      `New Project Inquiry — Zenovate Technologies
 
-    const claimMonsoonOffer = () => {
-      const msg = encodeURIComponent(
-        `Hello,\nI'm interested in your Monsoon Website Offer.\nPlease share more details.`
-      )
-      window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank")
-    }
+Name: ${form.name}
+Email: ${form.email}
+Phone: ${form.phone}
+Service: ${form.service}
+Budget: ${form.budget}
 
-    window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank")
-    setForm({ name: "", email: "", phone: "", service: "Website Development", budget: "₹10k – ₹25k", details: "" })
-    setToast(true)
-    setTimeout(() => setToast(false), 3000)
-  }
+Project Details:
+${form.details}`
+    );
+
+    window.open(`https://wa.me/${PHONE}?text=${msg}`, "_blank");
+
+    setForm({
+      name: "",
+      email: "",
+      phone: "",
+      service: "Website Development",
+      budget: "₹10k – ₹25k",
+      details: "",
+    });
+
+    setToast(true);
+    setTimeout(() => setToast(false), 3000);
+  };
 
   return (
     <>
