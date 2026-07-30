@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Github, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Github, Twitter, Linkedin, Instagram, Mail, Phone, MapPin, Facebook } from "lucide-react";
 import { motion } from "framer-motion";
 
 const CSS = `
@@ -153,9 +153,14 @@ export default function Footer() {
   const socialLinks = [
     {
       Icon: Github,
-      href: "https://github.com/",
+      href: "https://github.com",
       label: "Github",
     },
+   {
+  Icon: Facebook,
+  href: "https://www.facebook.com/share/1HHifc3cfB/",
+  label: "Facebook",
+},
     {
       Icon: Twitter,
       href: "https://twitter.com/",
@@ -163,7 +168,7 @@ export default function Footer() {
     },
     {
       Icon: Linkedin,
-      href: "https://www.linkedin.com/company/zenovate-technologies/",
+      href: "https://www.linkedin.com/company/zenovate-technologies/about/?viewAsMember=true",
       label: "LinkedIn",
     },
     {
