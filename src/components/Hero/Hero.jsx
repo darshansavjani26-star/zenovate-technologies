@@ -9,18 +9,17 @@ import {
   Check,
   Sparkles,
   Star,
-  Flame,
 } from 'lucide-react'
 
 
 /* =========================================================
-   GOLDEN PARTICLE FIELD
+   PARTICLE FIELD
 ========================================================= */
 
 function ParticleField() {
   const ref = useRef()
 
-  const count = 1800
+  const count = 1600
   const positions = new Float32Array(count * 3)
 
   for (let i = 0; i < count; i++) {
@@ -31,9 +30,8 @@ function ParticleField() {
 
   useFrame((state) => {
     if (ref.current) {
-      ref.current.rotation.y = state.clock.elapsedTime * 0.025
-      ref.current.rotation.x =
-        Math.sin(state.clock.elapsedTime * 0.15) * 0.04
+      ref.current.rotation.y =
+        state.clock.elapsedTime * 0.035
     }
   })
 
@@ -47,10 +45,10 @@ function ParticleField() {
       <PointMaterial
         transparent
         color="#d4b06a"
-        size={0.028}
+        size={0.026}
         sizeAttenuation
         depthWrite={false}
-        opacity={0.55}
+        opacity={0.35}
       />
     </Points>
   )
@@ -58,17 +56,20 @@ function ParticleField() {
 
 
 /* =========================================================
-   DIWALI FLOATING SPARKLES
+   DIWALI SPARKLES
 ========================================================= */
 
-const DIWALI_SPARKLES = Array.from({ length: 26 }, (_, i) => ({
-  id: i,
-  left: Math.random() * 100,
-  top: Math.random() * 100,
-  delay: Math.random() * 4,
-  duration: 2.5 + Math.random() * 2.5,
-  size: 5 + Math.random() * 7,
-}))
+const DIWALI_SPARKLES = Array.from(
+  { length: 22 },
+  (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    delay: Math.random() * 4,
+    duration: 2.5 + Math.random() * 2,
+    size: 5 + Math.random() * 5,
+  })
+)
 
 
 /* =========================================================
@@ -84,11 +85,30 @@ const offerHighlights = [
 
 
 /* =========================================================
+   RANGOLI PETALS
+========================================================= */
+
+const OUTER_PETALS = Array.from(
+  { length: 12 },
+  (_, i) => i * 30
+)
+
+const INNER_PETALS = Array.from(
+  { length: 12 },
+  (_, i) => ({
+    rotate: 15 + i * 30,
+    fill: i % 2 === 0 ? '#5a8e54' : '#d4b06a',
+    opacity: i % 2 === 0 ? 0.3 : 0.5,
+  })
+)
+
+
+/* =========================================================
    CSS
 ========================================================= */
 
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap');
 
 
   :root {
@@ -101,14 +121,14 @@ const CSS = `
     --green3: #8ab87a;
 
     --ink: #1e3a1a;
-    --muted: #7a9a74;
+    --muted: #4d6e48;
 
     --gold: #d4b06a;
     --gold2: #b88a3b;
     --gold3: #f0d596;
+    --gold-text: #85621c;
 
-    --cream: #fbfaf2;
-    --deepGreen: #0d2410;
+    --cream: #faf7ed;
   }
 
 
@@ -118,23 +138,25 @@ const CSS = `
 
   .hero {
     position: relative;
+
     min-height: 100vh;
 
     background:
       radial-gradient(
-        circle at 78% 28%,
-        rgba(212,176,106,0.16),
-        transparent 28%
+        circle at 78% 40%,
+        rgba(212,176,106,0.20),
+        transparent 34%
       ),
       radial-gradient(
-        circle at 15% 75%,
-        rgba(138,184,122,0.10),
-        transparent 30%
+        circle at 0% 100%,
+        rgba(138,184,122,0.26),
+        transparent 36%
       ),
       var(--sage);
 
     display: grid;
-    grid-template-columns: 1.02fr 0.98fr;
+
+    grid-template-columns: 1.05fr 0.95fr;
 
     align-items: center;
 
@@ -142,32 +164,34 @@ const CSS = `
 
     padding: 110px 56px 90px;
 
-    gap: 65px;
+    gap: 70px;
   }
 
 
   /* =====================================================
-     GOLDEN PARTICLE CANVAS
+     PARTICLE CANVAS
   ===================================================== */
 
   .hero__canvas {
     position: absolute;
+
     inset: 0;
 
     z-index: 0;
 
-    opacity: 0.45;
+    opacity: 0.35;
 
     pointer-events: none;
   }
 
 
   /* =====================================================
-     DIWALI SPARKLES
+     GOLD SPARKLES
   ===================================================== */
 
   .hero__sparkles {
     position: absolute;
+
     inset: 0;
 
     z-index: 1;
@@ -184,13 +208,16 @@ const CSS = `
     width: var(--sparkle-size);
     height: var(--sparkle-size);
 
-    color: var(--gold);
-
     opacity: 0;
 
+    color: var(--gold);
+
     animation:
-      sparkleFloat var(--sparkle-duration) ease-in-out
-      var(--sparkle-delay) infinite;
+      diwaliSparkle
+      var(--sparkle-duration)
+      ease-in-out
+      var(--sparkle-delay)
+      infinite;
   }
 
 
@@ -203,159 +230,67 @@ const CSS = `
     left: 50%;
     top: 50%;
 
-    transform: translate(-50%, -50%);
-
     background: currentColor;
 
     border-radius: 50%;
+
+    transform: translate(-50%, -50%);
   }
 
 
   .hero__sparkle::before {
     width: 100%;
-    height: 22%;
+    height: 20%;
   }
 
 
   .hero__sparkle::after {
-    width: 22%;
+    width: 20%;
     height: 100%;
   }
 
 
-  @keyframes sparkleFloat {
+  @keyframes diwaliSparkle {
+
     0% {
       opacity: 0;
-      transform: translateY(15px) scale(0.6) rotate(0deg);
+
+      transform:
+        translateY(12px)
+        scale(0.5)
+        rotate(0deg);
     }
 
-    25% {
-      opacity: 0.65;
+    30% {
+      opacity: 0.5;
     }
 
     50% {
-      opacity: 1;
-      transform: translateY(-8px) scale(1) rotate(45deg);
+      opacity: 0.9;
+
+      transform:
+        translateY(-8px)
+        scale(1)
+        rotate(45deg);
     }
 
-    75% {
-      opacity: 0.55;
+    80% {
+      opacity: 0.4;
     }
 
     100% {
       opacity: 0;
-      transform: translateY(-25px) scale(0.6) rotate(90deg);
+
+      transform:
+        translateY(-22px)
+        scale(0.5)
+        rotate(90deg);
     }
   }
 
 
   /* =====================================================
-     GOLDEN GLOW
-  ===================================================== */
-
-  .hero__glow {
-    position: absolute;
-
-    width: 620px;
-    height: 620px;
-
-    right: -160px;
-    top: 5%;
-
-    background:
-      radial-gradient(
-        circle,
-        rgba(212,176,106,0.25),
-        rgba(212,176,106,0.10) 32%,
-        transparent 70%
-      );
-
-    z-index: 1;
-
-    pointer-events: none;
-
-    filter: blur(5px);
-  }
-
-
-  .hero__glow-left {
-    position: absolute;
-
-    width: 420px;
-    height: 420px;
-
-    left: -200px;
-    bottom: -150px;
-
-    background:
-      radial-gradient(
-        circle,
-        rgba(138,184,122,0.18),
-        transparent 68%
-      );
-
-    z-index: 1;
-
-    pointer-events: none;
-  }
-
-
-  /* =====================================================
-     RANGOLI DECORATION
-  ===================================================== */
-
-  .hero__rangoli {
-    position: absolute;
-
-    width: 190px;
-    height: 190px;
-
-    right: 4%;
-    top: 8%;
-
-    border: 1px solid rgba(212,176,106,0.20);
-
-    border-radius: 50%;
-
-    transform: rotate(45deg);
-
-    z-index: 1;
-
-    opacity: 0.75;
-  }
-
-
-  .hero__rangoli::before {
-    content: '';
-
-    position: absolute;
-
-    inset: 22px;
-
-    border: 1px solid rgba(212,176,106,0.22);
-
-    transform: rotate(45deg);
-  }
-
-
-  .hero__rangoli::after {
-    content: '✦';
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%) rotate(-45deg);
-
-    font-size: 42px;
-
-    color: rgba(212,176,106,0.42);
-  }
-
-
-  /* =====================================================
-     HERO CONTENT
+     CONTENT
   ===================================================== */
 
   .hero__content {
@@ -378,25 +313,25 @@ const CSS = `
 
     gap: 8px;
 
-    border: 0.5px solid var(--gold);
+    border: 1px solid var(--gold);
 
-    background: rgba(212,176,106,0.12);
+    background: rgba(212,176,106,0.14);
 
-    padding: 7px 15px;
+    padding: 7px 16px;
 
     font-family: 'Jost', sans-serif;
 
     font-weight: 400;
 
-    font-size: 9px;
+    font-size: 10px;
 
     letter-spacing: 0.3em;
 
     text-transform: uppercase;
 
-    color: #a3813c;
+    color: var(--gold-text);
 
-    margin-bottom: 26px;
+    margin-bottom: 28px;
   }
 
 
@@ -406,13 +341,18 @@ const CSS = `
 
     border-radius: 50%;
 
-    background: var(--gold);
+    background: var(--gold2);
 
-    animation: heroBlink 2s ease-in-out infinite;
+    animation:
+      heroBlink
+      2s
+      ease-in-out
+      infinite;
   }
 
 
   @keyframes heroBlink {
+
     0%,
     100% {
       opacity: 1;
@@ -425,32 +365,39 @@ const CSS = `
 
 
   /* =====================================================
-     HERO HEADING
+     HEADING
   ===================================================== */
 
   .hero__heading {
-    font-family: 'Cormorant Garamond', serif;
+    font-family:
+      'Cormorant Garamond',
+      serif;
 
     font-weight: 400;
 
-    font-size: clamp(44px, 5.4vw, 72px);
+    font-size:
+      clamp(46px, 6vw, 82px);
 
-    line-height: 1.04;
+    line-height: 1.03;
 
-    letter-spacing: 0.015em;
+    letter-spacing: 0.01em;
 
     color: var(--ink);
 
-    margin-bottom: 16px;
+    margin: 0 0 18px;
 
     display: flex;
 
     flex-direction: column;
+
+    text-wrap: balance;
   }
 
 
   .hero__word {
     font-style: italic;
+
+    font-weight: 500;
 
     color: var(--green2);
   }
@@ -472,13 +419,13 @@ const CSS = `
 
     font-weight: 400;
 
-    font-size: 15px;
+    font-size: 16px;
 
     letter-spacing: 0.03em;
 
     color: var(--green);
 
-    margin-bottom: 16px;
+    margin: 0 0 14px;
   }
 
 
@@ -487,32 +434,34 @@ const CSS = `
 
     font-weight: 300;
 
-    font-size: 13px;
+    font-size: 14px;
 
-    letter-spacing: 0.07em;
+    letter-spacing: 0.04em;
 
-    line-height: 2;
+    line-height: 1.9;
 
     color: var(--muted);
 
-    max-width: 480px;
+    max-width: 470px;
 
-    margin-bottom: 30px;
+    margin: 0 0 32px;
   }
 
 
   /* =====================================================
-     CTA
+     BUTTONS
   ===================================================== */
 
   .hero__cta {
     display: flex;
 
+    flex-wrap: wrap;
+
     align-items: center;
 
     gap: 14px;
 
-    margin-bottom: 34px;
+    margin-bottom: 40px;
   }
 
 
@@ -521,15 +470,17 @@ const CSS = `
 
     align-items: center;
 
-    gap: 8px;
+    gap: 10px;
+
+    min-height: 48px;
 
     font-family: 'Jost', sans-serif;
 
     font-weight: 500;
 
-    font-size: 9px;
+    font-size: 11px;
 
-    letter-spacing: 0.22em;
+    letter-spacing: 0.24em;
 
     text-transform: uppercase;
 
@@ -539,7 +490,7 @@ const CSS = `
 
     border: none;
 
-    padding: 14px 27px;
+    padding: 0 30px;
 
     cursor: pointer;
 
@@ -558,7 +509,8 @@ const CSS = `
     transform: translateY(-2px);
 
     box-shadow:
-      0 10px 30px rgba(30,58,26,0.18);
+      0 14px 28px
+      rgba(30,58,26,0.18);
   }
 
 
@@ -567,15 +519,17 @@ const CSS = `
 
     align-items: center;
 
-    gap: 7px;
+    gap: 8px;
+
+    min-height: 48px;
 
     font-family: 'Jost', sans-serif;
 
     font-weight: 400;
 
-    font-size: 9px;
+    font-size: 11px;
 
-    letter-spacing: 0.22em;
+    letter-spacing: 0.24em;
 
     text-transform: uppercase;
 
@@ -583,9 +537,9 @@ const CSS = `
 
     background: transparent;
 
-    border: 0.5px solid var(--green3);
+    border: 1px solid var(--green3);
 
-    padding: 14px 27px;
+    padding: 0 30px;
 
     cursor: pointer;
 
@@ -607,16 +561,31 @@ const CSS = `
   }
 
 
+  .hero__btn-main:focus-visible,
+  .hero__btn-ghost:focus-visible {
+    outline: 2px solid var(--green);
+
+    outline-offset: 3px;
+  }
+
+
   /* =====================================================
      HIGHLIGHTS
   ===================================================== */
 
   .hero__highlights {
-    display: flex;
+    display: grid;
 
-    flex-direction: column;
+    grid-template-columns:
+      repeat(auto-fit, minmax(230px, 1fr));
 
-    gap: 9px;
+    gap: 12px 24px;
+
+    padding-top: 24px;
+
+    border-top:
+      1px solid
+      rgba(184,138,59,0.45);
   }
 
 
@@ -625,15 +594,15 @@ const CSS = `
 
     align-items: center;
 
-    gap: 10px;
+    gap: 12px;
 
     font-family: 'Jost', sans-serif;
 
     font-weight: 400;
 
-    font-size: 11.5px;
+    font-size: 13px;
 
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
 
     color: var(--ink);
   }
@@ -644,512 +613,317 @@ const CSS = `
 
     place-items: center;
 
-    width: 17px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 
     border-radius: 50%;
 
-    background: rgba(90,142,84,0.15);
+    background: rgba(90,142,84,0.16);
 
-    color: var(--green2);
+    color: var(--green);
 
     flex-shrink: 0;
   }
 
 
   /* =====================================================
-     DIWALI VISUAL CARD
+     RIGHT SIDE - ARCH
   ===================================================== */
 
-  .hero__visual {
+  .hero__visual-wrap {
     position: relative;
 
     z-index: 3;
 
-    min-height: 500px;
-
-    overflow: hidden;
-
-    border: 0.5px solid rgba(212,176,106,0.45);
-
-    background:
-      linear-gradient(
-        145deg,
-        #eef5eb 0%,
-        #f7f4e8 48%,
-        #e7eddf 100%
-      );
-
-    box-shadow:
-      0 30px 70px rgba(61,110,56,0.13);
-
     display: flex;
-
-    align-items: center;
 
     justify-content: center;
   }
 
 
-  /* =====================================================
-     CARD DECORATION
-  ===================================================== */
+  .arch {
+    position: relative;
 
-  .diwali-card-glow {
-    position: absolute;
+    width: 100%;
 
-    width: 360px;
-    height: 360px;
+    max-width: 440px;
 
-    right: -90px;
-    top: -90px;
+    aspect-ratio: 440 / 560;
 
-    border-radius: 50%;
+    overflow: hidden;
+
+    border-radius: 220px 220px 0 0;
+
+    border:
+      1px solid
+      rgba(184,138,59,0.7);
 
     background:
-      radial-gradient(
-        circle,
-        rgba(212,176,106,0.32),
-        transparent 68%
+      linear-gradient(
+        160deg,
+        #faf7ed 0%,
+        #edf4e9 55%,
+        #dfeadb 100%
       );
 
-    filter: blur(4px);
+    box-shadow:
+      0 0 0 8px rgba(212,176,106,0.12),
+      0 34px 70px rgba(61,110,56,0.16);
   }
 
 
-  .diwali-card-glow-left {
+  .arch__art {
     position: absolute;
 
-    width: 260px;
-    height: 260px;
+    left: 0;
+    right: 0;
+    top: 17%;
 
-    left: -100px;
-    bottom: -100px;
+    width: 100%;
+    height: auto;
 
-    border-radius: 50%;
-
-    background:
-      radial-gradient(
-        circle,
-        rgba(90,142,84,0.17),
-        transparent 70%
-      );
+    display: block;
   }
 
 
-  /* =====================================================
-     HANGING LANTERNS
-  ===================================================== */
-
-  .diwali-lantern {
+  .arch__label {
     position: absolute;
 
-    width: 22px;
-    height: 32px;
+    left: 0;
+    right: 0;
+    top: 11%;
 
-    border: 1px solid rgba(184,138,59,0.65);
+    text-align: center;
+
+    font-family: 'Jost', sans-serif;
+
+    font-size: 10px;
+
+    letter-spacing: 0.34em;
+
+    text-transform: uppercase;
+
+    color: var(--gold-text);
+  }
+
+
+  /* Rangoli motion */
+
+  .arch__spin {
+    transform-box: fill-box;
+
+    transform-origin: center;
+
+    animation: archSpin 90s linear infinite;
+  }
+
+
+  .arch__spin--rev {
+    animation:
+      archSpin
+      140s
+      linear
+      reverse
+      infinite;
+  }
+
+
+  @keyframes archSpin {
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+
+  .arch__flame {
+    transform-box: fill-box;
+
+    transform-origin: 50% 100%;
+
+    animation:
+      flameFlicker
+      1.8s
+      ease-in-out
+      infinite;
+  }
+
+
+  @keyframes flameFlicker {
+
+    0%,
+    100% {
+      transform: rotate(2deg) scaleY(1);
+    }
+
+    35% {
+      transform: rotate(-3deg) scaleY(1.07);
+    }
+
+    70% {
+      transform: rotate(3deg) scaleY(0.96);
+    }
+  }
+
+
+  .arch__halo {
+    animation:
+      archHalo
+      3.6s
+      ease-in-out
+      infinite;
+  }
+
+
+  @keyframes archHalo {
+
+    0%,
+    100% {
+      opacity: 0.7;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
+
+  /* Lanterns */
+
+  .arch__lantern {
+    position: absolute;
+
+    top: 0;
+
+    transform-origin: 50% 0;
+
+    animation:
+      lanternSwing
+      5s
+      ease-in-out
+      infinite;
+
+    z-index: 4;
+  }
+
+
+  .arch__lantern::before {
+    content: '';
+
+    display: block;
+
+    width: 1px;
+
+    height: var(--string);
+
+    margin: 0 auto;
+
+    background: rgba(184,138,59,0.6);
+  }
+
+
+  .arch__lantern span {
+    display: block;
+
+    width: var(--w);
+    height: var(--h);
+
+    border: 1px solid var(--gold2);
 
     background:
       linear-gradient(
         180deg,
-        rgba(255,224,148,0.75),
-        rgba(212,176,106,0.25)
+        rgba(255,225,150,0.95),
+        var(--tail)
       );
 
     box-shadow:
-      0 0 18px rgba(212,176,106,0.35);
-
-    transform-origin: top center;
-
-    animation: lanternSwing 4s ease-in-out infinite;
+      0 0 20px
+      rgba(212,176,106,0.55);
   }
 
 
-  .diwali-lantern::before {
-    content: '';
+  .arch__lantern--one {
+    left: 24%;
 
-    position: absolute;
-
-    width: 1px;
-    height: 45px;
-
-    background: rgba(184,138,59,0.55);
-
-    left: 50%;
-    bottom: 100%;
+    --string: 54px;
+    --w: 22px;
+    --h: 30px;
+    --tail: rgba(212,176,106,0.3);
   }
 
 
-  .diwali-lantern::after {
-    content: '';
+  .arch__lantern--two {
+    right: 22%;
 
-    position: absolute;
-
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-
-    background: #f3c85f;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    box-shadow:
-      0 0 16px #f3c85f;
-  }
-
-
-  .diwali-lantern--one {
-    top: 0;
-    right: 16%;
-
-    animation-delay: -1s;
-  }
-
-
-  .diwali-lantern--two {
-    top: 0;
-    right: 8%;
-
-    transform: scale(0.75);
+    --string: 84px;
+    --w: 18px;
+    --h: 25px;
+    --tail: rgba(138,184,122,0.4);
 
     animation-delay: -2s;
   }
 
 
   @keyframes lanternSwing {
+
     0%,
     100% {
-      transform: rotate(3deg);
+      transform: rotate(1.8deg);
     }
 
     50% {
-      transform: rotate(-3deg);
+      transform: rotate(-1.8deg);
     }
   }
 
 
-  /* =====================================================
-     CENTRAL DIYA
-  ===================================================== */
+  /* Offer ribbon */
 
-  .diya-wrapper {
+  .arch__offer {
     position: absolute;
 
-    bottom: 62px;
-    left: 50%;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-    transform: translateX(-50%);
-
-    width: 180px;
-    height: 100px;
+    z-index: 8;
 
     display: flex;
-
-    justify-content: center;
-
-    align-items: flex-end;
-  }
-
-
-  .diya {
-    position: relative;
-
-    width: 130px;
-    height: 48px;
-
-    background:
-      linear-gradient(
-        180deg,
-        #e3bf70,
-        #a97830
-      );
-
-    border-radius:
-      50%
-      50%
-      45%
-      45%;
-
-    box-shadow:
-      0 12px 30px rgba(184,138,59,0.25);
-  }
-
-
-  .diya::before {
-    content: '';
-
-    position: absolute;
-
-    width: 88px;
-    height: 24px;
-
-    left: 21px;
-    top: -7px;
-
-    background:
-      radial-gradient(
-        ellipse,
-        #fff0bd,
-        #d4b06a
-      );
-
-    border-radius: 50%;
-  }
-
-
-  .diya__flame {
-    position: absolute;
-
-    width: 23px;
-    height: 39px;
-
-    left: 54px;
-    top: -42px;
-
-    background:
-      linear-gradient(
-        180deg,
-        #fff7cf,
-        #f0c55b 55%,
-        #d98232
-      );
-
-    border-radius:
-      55% 45% 60% 40%;
-
-    transform: rotate(3deg);
-
-    filter:
-      drop-shadow(
-        0 0 13px rgba(240,197,91,0.85)
-      );
-
-    animation: flameFlicker 1.8s ease-in-out infinite;
-  }
-
-
-  .diya__flame::after {
-    content: '';
-
-    position: absolute;
-
-    width: 8px;
-    height: 18px;
-
-    left: 7px;
-    top: 11px;
-
-    background: #fffdf0;
-
-    border-radius: 50%;
-  }
-
-
-  @keyframes flameFlicker {
-    0%,
-    100% {
-      transform: rotate(3deg) scale(1);
-    }
-
-    50% {
-      transform: rotate(-4deg) scale(1.08);
-    }
-  }
-
-
-  /* =====================================================
-     CARD CONTENT
-  ===================================================== */
-
-  .diwali-card-content {
-    position: relative;
-
-    z-index: 5;
-
-    width: 100%;
-
-    height: 100%;
-
-    min-height: 500px;
-
-    display: flex;
-
-    flex-direction: column;
 
     align-items: center;
 
     justify-content: center;
 
-    text-align: center;
+    gap: 12px;
 
-    padding: 50px 35px 145px;
+    padding: 18px 24px;
+
+    background: rgba(255,255,255,0.6);
+
+    border-top:
+      1px solid
+      rgba(184,138,59,0.4);
   }
 
 
-  .diwali-card-icon {
-    width: 48px;
-    height: 48px;
-
-    border-radius: 50%;
-
-    display: grid;
-
-    place-items: center;
-
-    color: var(--gold2);
-
-    border: 1px solid rgba(184,138,59,0.35);
-
-    background: rgba(255,255,255,0.45);
-
-    margin-bottom: 20px;
-
-    box-shadow:
-      0 10px 30px rgba(184,138,59,0.08);
-  }
-
-
-  .diwali-card-small {
+  .arch__offer span {
     font-family: 'Jost', sans-serif;
 
-    font-size: 9px;
-
-    letter-spacing: 0.35em;
-
-    text-transform: uppercase;
-
-    color: var(--gold2);
-
-    margin-bottom: 12px;
-  }
-
-
-  .diwali-card-title {
-    font-family: 'Cormorant Garamond', serif;
-
-    font-weight: 400;
-
-    font-size: clamp(38px, 4vw, 58px);
-
-    line-height: 0.95;
-
-    color: var(--ink);
-
-    margin: 0 0 12px;
-  }
-
-
-  .diwali-card-title span {
-    color: var(--gold2);
-
-    font-style: italic;
-  }
-
-
-  .diwali-card-subtitle {
-    font-family: 'Jost', sans-serif;
+    font-weight: 500;
 
     font-size: 10px;
 
-    line-height: 1.8;
-
-    letter-spacing: 0.15em;
+    letter-spacing: 0.24em;
 
     text-transform: uppercase;
 
     color: var(--green);
-
-    max-width: 300px;
   }
 
 
-  .diwali-card-brand {
-    position: absolute;
-
-    top: 30px;
-    left: 30px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 9px;
-
-    font-family: 'Jost', sans-serif;
-
-    font-size: 9px;
-
-    letter-spacing: 0.22em;
-
-    text-transform: uppercase;
-
-    color: var(--ink);
-  }
-
-
-  .diwali-card-brand-mark {
-    width: 27px;
-    height: 27px;
-
-    display: grid;
-
-    place-items: center;
-
-    border: 1px solid rgba(184,138,59,0.5);
-
+  .arch__offer svg {
     color: var(--gold2);
-
-    font-family: 'Cormorant Garamond', serif;
-
-    font-size: 17px;
-  }
-
-
-  /* =====================================================
-     BOTTOM OFFER LABEL
-  ===================================================== */
-
-  .diwali-offer-strip {
-    position: absolute;
-
-    left: 25px;
-    right: 25px;
-    bottom: 25px;
-
-    padding: 13px 17px;
-
-    background:
-      rgba(255,255,255,0.55);
-
-    backdrop-filter: blur(10px);
-
-    border:
-      1px solid rgba(212,176,106,0.28);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-  }
-
-
-  .diwali-offer-strip span {
-    font-family: 'Jost', sans-serif;
-
-    font-size: 8px;
-
-    letter-spacing: 0.2em;
-
-    text-transform: uppercase;
-
-    color: var(--green);
   }
 
 
@@ -1157,35 +931,17 @@ const CSS = `
      RESPONSIVE
   ===================================================== */
 
-  @media (max-width: 1000px) {
+  @media (max-width: 900px) {
 
     .hero {
       grid-template-columns: 1fr;
 
       padding:
-        100px
-        35px
+        95px
+        24px
         80px;
 
-      gap: 45px;
-    }
-
-
-    .hero__content {
-      max-width: 760px;
-    }
-
-
-    .hero__visual {
-      width: 100%;
-
-      min-height: 500px;
-    }
-
-
-    .hero__rangoli {
-      right: -60px;
-      top: 8%;
+      gap: 56px;
     }
   }
 
@@ -1194,16 +950,9 @@ const CSS = `
 
     .hero {
       padding:
-        85px
+        82px
         20px
-        65px;
-
-      gap: 35px;
-    }
-
-
-    .hero__heading {
-      font-size: 48px;
+        70px;
     }
 
 
@@ -1214,60 +963,32 @@ const CSS = `
     }
 
 
-    .hero__btn-main,
-    .hero__btn-ghost {
-      width: auto;
+    .arch {
+      border-radius: 180px 180px 0 0;
+    }
+  }
+
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .hero__sparkle,
+    .hero__badge-dot,
+    .arch__spin,
+    .arch__flame,
+    .arch__halo,
+    .arch__lantern {
+      animation: none;
     }
 
-
-    .hero__visual {
-      min-height: 430px;
-    }
-
-
-    .diwali-card-content {
-      min-height: 430px;
-
-      padding:
-        45px
-        25px
-        125px;
-    }
-
-
-    .diwali-card-title {
-      font-size: 43px;
-    }
-
-
-    .diya-wrapper {
-      bottom: 58px;
-
-      transform:
-        translateX(-50%)
-        scale(0.78);
-    }
-
-
-    .diwali-offer-strip {
-      left: 15px;
-      right: 15px;
-      bottom: 15px;
-    }
-
-
-    .hero__rangoli {
-      width: 130px;
-      height: 130px;
-
-      right: -45px;
+    .hero__sparkle {
+      opacity: 0.6;
     }
   }
 `
 
 
 /* =========================================================
-   HERO COMPONENT
+   HERO
 ========================================================= */
 
 export default function Hero() {
@@ -1298,14 +1019,17 @@ export default function Hero() {
 
       /* Heading */
 
-      gsap.from(headingRef.current.children, {
-        opacity: 0,
-        y: 60,
-        stagger: 0.12,
-        duration: 1,
-        delay: 0.4,
-        ease: 'power4.out',
-      })
+      gsap.from(
+        headingRef.current.children,
+        {
+          opacity: 0,
+          y: 60,
+          stagger: 0.12,
+          duration: 1,
+          delay: 0.4,
+          ease: 'power4.out',
+        }
+      )
 
 
       /* Subtitle */
@@ -1332,26 +1056,32 @@ export default function Hero() {
 
       /* Buttons */
 
-      gsap.from(ctaRef.current.children, {
-        opacity: 0,
-        y: 20,
-        stagger: 0.12,
-        duration: 0.7,
-        delay: 1.2,
-        ease: 'power3.out',
-      })
+      gsap.from(
+        ctaRef.current.children,
+        {
+          opacity: 0,
+          y: 20,
+          stagger: 0.12,
+          duration: 0.7,
+          delay: 1.2,
+          ease: 'power3.out',
+        }
+      )
 
 
-      /* Offer list */
+      /* Highlights */
 
-      gsap.from(highlightsRef.current.children, {
-        opacity: 0,
-        x: -16,
-        stagger: 0.1,
-        duration: 0.6,
-        delay: 1.5,
-        ease: 'power3.out',
-      })
+      gsap.from(
+        highlightsRef.current.children,
+        {
+          opacity: 0,
+          x: -16,
+          stagger: 0.1,
+          duration: 0.6,
+          delay: 1.5,
+          ease: 'power3.out',
+        }
+      )
 
     })
 
@@ -1370,7 +1100,7 @@ export default function Hero() {
 
 
         {/* =================================================
-            GOLDEN PARTICLES
+            PARTICLE BACKGROUND
         ================================================= */}
 
         <div
@@ -1391,7 +1121,7 @@ export default function Hero() {
 
             <pointLight
               position={[5, 5, 5]}
-              intensity={0.5}
+              intensity={0.4}
               color="#d4b06a"
             />
 
@@ -1402,7 +1132,7 @@ export default function Hero() {
 
 
         {/* =================================================
-            FLOATING SPARKLES
+            DIWALI SPARKLES
         ================================================= */}
 
         <div
@@ -1434,17 +1164,6 @@ export default function Hero() {
           ))}
 
         </div>
-
-
-        {/* =================================================
-            BACKGROUND GLOW
-        ================================================= */}
-
-        <div className="hero__glow" />
-
-        <div className="hero__glow-left" />
-
-        <div className="hero__rangoli" />
 
 
         {/* =================================================
@@ -1482,10 +1201,13 @@ export default function Hero() {
             </span>
 
             <span className="hero__word">
+
               Shine This
+
               <span className="hero__gold-word">
                 {' '}Diwali
               </span>
+
             </span>
 
           </h1>
@@ -1497,8 +1219,8 @@ export default function Hero() {
             className="hero__subtitle"
             ref={subtitleRef}
           >
-            Give your business a brighter digital presence
-            this festive season.
+            Launch Your Business Website
+            This Diwali
           </p>
 
 
@@ -1508,13 +1230,14 @@ export default function Hero() {
             className="hero__sub"
             ref={subRef}
           >
-            Build a professional website that makes your
-            brand stand out, attract more customers and
-            turn your ideas into a powerful digital presence.
+            Give your business a brighter digital
+            presence this festive season with a
+            professional website designed to attract
+            customers and grow your brand.
           </p>
 
 
-          {/* CTA */}
+          {/* Buttons */}
 
           <div
             className="hero__cta"
@@ -1540,14 +1263,12 @@ export default function Hero() {
 
               View Offer
 
-              <Sparkles size={13} />
-
             </Link>
 
           </div>
 
 
-          {/* Offer Highlights */}
+          {/* Highlights */}
 
           <div
             className="hero__highlights"
@@ -1561,10 +1282,12 @@ export default function Hero() {
                 key={item}
               >
 
-                <span className="hero__highlight-check">
+                <span
+                  className="hero__highlight-check"
+                >
 
                   <Check
-                    size={10}
+                    size={11}
                     strokeWidth={3}
                   />
 
@@ -1582,11 +1305,12 @@ export default function Hero() {
 
 
         {/* =================================================
-            RIGHT DIWALI CREATIVE
+            RIGHT SIDE
+            ARCH WITH RANGOLI AND DIYA
         ================================================= */}
 
         <motion.div
-          className="hero__visual"
+          className="hero__visual-wrap"
 
           initial={{
             opacity: 0,
@@ -1605,110 +1329,268 @@ export default function Hero() {
           }}
         >
 
-
-          {/* Background glows */}
-
-          <div className="diwali-card-glow" />
-
-          <div className="diwali-card-glow-left" />
+          <div className="arch">
 
 
-          {/* Hanging lanterns */}
+            {/* Hanging lanterns */}
 
-          <div className="diwali-lantern diwali-lantern--one" />
-
-          <div className="diwali-lantern diwali-lantern--two" />
-
-
-          {/* Brand */}
-
-          <div className="diwali-card-brand">
-
-            <div className="diwali-card-brand-mark">
-              Z
+            <div
+              className="
+                arch__lantern
+                arch__lantern--one
+              "
+              aria-hidden="true"
+            >
+              <span />
             </div>
 
-            Zenovate
-
-          </div>
-
-
-          {/* Main card content */}
-
-          <div className="diwali-card-content">
-
-
-            <div className="diwali-card-icon">
-
-              <Flame size={21} />
-
+            <div
+              className="
+                arch__lantern
+                arch__lantern--two
+              "
+              aria-hidden="true"
+            >
+              <span />
             </div>
 
 
-            <div className="diwali-card-small">
+            {/* Rangoli + diya */}
 
-              Festive Digital Celebration
+            <svg
+              className="arch__art"
+              viewBox="0 0 480 480"
+              role="img"
+              aria-label="Rangoli pattern around a lit diya"
+            >
 
+              <defs>
+
+                <radialGradient
+                  id="archGlow"
+                  cx="50%"
+                  cy="50%"
+                  r="50%"
+                >
+                  <stop
+                    offset="0"
+                    stopColor="#FFD66E"
+                    stopOpacity="0.8"
+                  />
+                  <stop
+                    offset="0.5"
+                    stopColor="#E9B94F"
+                    stopOpacity="0.26"
+                  />
+                  <stop
+                    offset="1"
+                    stopColor="#E9B94F"
+                    stopOpacity="0"
+                  />
+                </radialGradient>
+
+                <linearGradient
+                  id="archBowl"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="0" stopColor="#E2BE6B" />
+                  <stop offset="1" stopColor="#A97931" />
+                </linearGradient>
+
+                <linearGradient
+                  id="archFlame"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="0" stopColor="#FFF8D7" />
+                  <stop offset="0.55" stopColor="#F0C55B" />
+                  <stop offset="1" stopColor="#D98232" />
+                </linearGradient>
+
+              </defs>
+
+
+              {/* Dotted rings */}
+
+              <circle
+                className="arch__spin arch__spin--rev"
+                cx="240"
+                cy="240"
+                r="226"
+                fill="none"
+                stroke="#b88a3b"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeDasharray="0.1 13"
+                opacity="0.75"
+              />
+
+              <circle
+                cx="240"
+                cy="240"
+                r="208"
+                fill="none"
+                stroke="#b88a3b"
+                strokeWidth="1"
+                opacity="0.35"
+              />
+
+
+              {/* Outer petals */}
+
+              <g
+                className="arch__spin"
+                fill="none"
+                stroke="#b88a3b"
+                strokeWidth="1.4"
+                opacity="0.85"
+              >
+                {OUTER_PETALS.map((rotate) => (
+                  <ellipse
+                    key={rotate}
+                    cx="240"
+                    cy="62"
+                    rx="13"
+                    ry="34"
+                    transform={`rotate(${rotate} 240 240)`}
+                  />
+                ))}
+              </g>
+
+
+              {/* Inner petals */}
+
+              <g
+                className="arch__spin arch__spin--rev"
+                stroke="#b88a3b"
+                strokeWidth="1"
+                strokeOpacity="0.65"
+              >
+                {INNER_PETALS.map((petal) => (
+                  <ellipse
+                    key={petal.rotate}
+                    cx="240"
+                    cy="112"
+                    rx="15"
+                    ry="30"
+                    fill={petal.fill}
+                    fillOpacity={petal.opacity}
+                    transform={`rotate(${petal.rotate} 240 240)`}
+                  />
+                ))}
+              </g>
+
+
+              {/* Centre disc */}
+
+              <circle
+                cx="240"
+                cy="240"
+                r="132"
+                fill="#faf7ed"
+                stroke="#b88a3b"
+                strokeWidth="1"
+                strokeOpacity="0.6"
+              />
+
+              <circle
+                cx="240"
+                cy="240"
+                r="120"
+                fill="none"
+                stroke="#5a8e54"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="0.1 9"
+                opacity="0.5"
+              />
+
+
+              {/* Glow */}
+
+              <circle
+                className="arch__halo"
+                cx="240"
+                cy="226"
+                r="118"
+                fill="url(#archGlow)"
+              />
+
+
+              {/* Diya */}
+
+              <path
+                d="M168 258 C176 306 304 306 312 258 Z"
+                fill="url(#archBowl)"
+              />
+
+              <ellipse
+                cx="240"
+                cy="258"
+                rx="72"
+                ry="12"
+                fill="#FFF0BD"
+              />
+
+              <ellipse
+                cx="240"
+                cy="258"
+                rx="52"
+                ry="7"
+                fill="#d4b06a"
+              />
+
+              <path
+                d="M312 258 C330 254 338 246 342 238 C332 240 322 246 312 250 Z"
+                fill="#b8832f"
+              />
+
+              <path
+                className="arch__flame"
+                d="M240 168 C262 200 264 228 240 254 C216 228 218 200 240 168 Z"
+                fill="url(#archFlame)"
+              />
+
+              <path
+                className="arch__flame"
+                d="M240 214 C247 226 247 238 240 250 C233 238 233 226 240 214 Z"
+                fill="#FFFDF0"
+              />
+
+            </svg>
+
+
+            {/* Label */}
+
+            <div className="arch__label">
+              Zenovate · Shubh Diwali
             </div>
 
 
-            <h2 className="diwali-card-title">
+            {/* Bottom offer ribbon */}
 
-              Happy
+            <div className="arch__offer">
 
-              <br />
+              <Star
+                size={12}
+                fill="currentColor"
+              />
 
-              <span>Diwali</span>
+              <span>
+                Special Diwali Website Offer
+              </span>
 
-            </h2>
-
-
-            <p className="diwali-card-subtitle">
-
-              Brighter Ideas
-              <br />
-
-              Bigger Dreams
-              <br />
-
-              Powerful Digital Experiences
-
-            </p>
-
-
-            {/* Diya */}
-
-            <div className="diya-wrapper">
-
-              <div className="diya">
-
-                <div className="diya__flame" />
-
-              </div>
+              <Star
+                size={12}
+                fill="currentColor"
+              />
 
             </div>
-
-
-          </div>
-
-
-          {/* Offer strip */}
-
-          <div className="diwali-offer-strip">
-
-            <Star
-              size={12}
-              fill="currentColor"
-            />
-
-            <span>
-              Special Diwali Website Offer
-            </span>
-
-            <Star
-              size={12}
-              fill="currentColor"
-            />
 
           </div>
 
