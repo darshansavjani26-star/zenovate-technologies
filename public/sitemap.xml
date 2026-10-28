@@ -1,29 +1,22 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
-
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
   <url>
-    <loc>https://zenovate-technologies.vercel.app/</loc>
+    <loc>https://www.zenovatetechnologies.in/</loc>
   </url>
-
   <url>
-    <loc>https://zenovate-technologies.vercel.app/about</loc>
+    <loc>https://www.zenovatetechnologies.in/about</loc>
   </url>
-
   <url>
-    <loc>https://zenovate-technologies.vercel.app/services</loc>
+    <loc>https://www.zenovatetechnologies.in/services</loc>
   </url>
-
   <url>
-    <loc>https://zenovate-technologies.vercel.app/portfolio</loc>
+    <loc>https://www.zenovatetechnologies.in/portfolio</loc>
   </url>
-
   <url>
-    <loc>https://zenovate-technologies.vercel.app/pricing</loc>
+    <loc>https://www.zenovatetechnologies.in/pricing</loc>
   </url>
-
   <url>
-    <loc>https://zenovate-technologies.vercel.app/contact</loc>
+    <loc>https://www.zenovatetechnologies.in/contact</loc>
   </url>
-
 </urlset>
